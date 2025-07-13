@@ -1,0 +1,47 @@
+[package]
+name = "comrude"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Universal AI Development Assistant - CLI tool for accessing multiple LLM providers"
+
+[[bin]]
+name = "comrude"
+path = "src/main.rs"
+
+[dependencies]
+# Workspace crates
+comrude-core.workspace = true
+comrude-providers.workspace = true
+comrude-tools.workspace = true
+
+# CLI and config
+clap.workspace = true
+dirs.workspace = true
+config.workspace = true
+
+# Async runtime
+tokio.workspace = true
+
+# Error handling
+anyhow.workspace = true
+thiserror.workspace = true
+
+# Logging
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Serialization
+serde.workspace = true
+toml.workspace = true
+
+# UUID and chrono for our simple implementation
+uuid.workspace = true
+chrono.workspace = true

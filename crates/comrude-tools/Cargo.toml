@@ -1,0 +1,50 @@
+[package]
+name = "comrude-tools"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Tool implementations for Comrude - file ops, shell execution, etc."
+
+[lib]
+name = "comrude_tools"
+path = "src/lib.rs"
+
+[dependencies]
+# Workspace crates
+comrude-core.workspace = true
+
+# Async runtime
+tokio.workspace = true
+futures.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+anyhow.workspace = true
+thiserror.workspace = true
+
+# UUID and time
+uuid.workspace = true
+chrono.workspace = true
+
+# Async traits
+async-trait.workspace = true
+
+# Logging
+tracing.workspace = true
+
+# File operations
+walkdir = "2.4"
+notify = "6.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.8"

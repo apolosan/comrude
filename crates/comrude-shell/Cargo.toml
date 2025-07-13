@@ -1,0 +1,51 @@
+[package]
+name = "comrude-shell"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Interactive shell and TUI interface for Comrude"
+
+[lib]
+name = "comrude_shell"
+path = "src/lib.rs"
+
+[dependencies]
+# Workspace crates
+comrude-core.workspace = true
+comrude-providers.workspace = true
+comrude-tools.workspace = true
+
+# TUI Framework
+ratatui.workspace = true
+crossterm.workspace = true
+
+# Syntax highlighting
+syntect.workspace = true
+
+# Async runtime
+tokio.workspace = true
+futures.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+anyhow.workspace = true
+thiserror.workspace = true
+
+# UUID and time
+uuid.workspace = true
+chrono.workspace = true
+
+# Logging
+tracing.workspace = true
+
+[dev-dependencies]
+tokio-test = "0.4"
