@@ -1,8 +1,11 @@
 use clap::{Arg, Command};
-use comrude_core::Config;
+use comrude_core::{Config, ComrudeEngine};
+use comrude_core::memory::MemoryConfig;
+use comrude_core::types::{Message, ContextItem};
 use comrude_providers::{ProviderManager, OpenAIProvider, AnthropicProvider, OllamaProvider};
 use std::io::{self, Write};
 use std::process::Command;
+use std::sync::Arc;
 use crossterm::{
     execute, 
     terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen}, 
@@ -78,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Start interactive mode if requested or no specific command
     if matches.get_flag("interactive") || std::env::args().len() == 1 {
-        start_simple_interactive_mode(provider_manager).await?;
+        start_memory_interactive_mode(provider_manager, config).await?;
     } else {
         // Handle direct commands here in the future
         println!("Direct command mode not implemented yet. Use --interactive or -i for interactive mode.");
@@ -194,12 +197,18 @@ fn clear_screen() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-async fn start_simple_interactive_mode(provider_manager: ProviderManager) -> Result<(), Box<dyn std::error::Error>> {
+async fn start_memory_interactive_mode(provider_manager: ProviderManager, config: Config) -> Result<(), Box<dyn std::error::Error>> {
     println!("Comrude - Universal AI Development Assistant");
-    println!("Available commands: ask <question>, help, providers, quit");
-    println!("Type 'help' for more information.\n");
+    println!("Available commands: <question>, /help, /providers, /quit");
+    println!("Type '/help' for more information.\n");
 
-    let provider_manager = std::sync::Arc::new(provider_manager);
+    let provider_manager = Arc::new(provider_manager);
+    
+    // Initialize ComrudeEngine with memory
+    let memory_config = config.memory.clone().into();
+    let mut engine = ComrudeEngine::new_with_config(memory_config);
+    let _session_id = engine.create_session(Some("Main Session".to_string())).await?;
+    
     let stdin = io::stdin();
     
     loop {
@@ -218,11 +227,12 @@ async fn start_simple_interactive_mode(provider_manager: ProviderManager) -> Res
                     continue;
                 }
                 
-                if command == "quit" || command == "exit" || command == "q" {
+                if command == "quit" || command == "exit" || command == "q" || 
+                   command == "/quit" || command == "/exit" || command == "/q" {
                     break;
                 }
                 
-                if let Err(e) = process_simple_command(&provider_manager, command).await {
+                if let Err(e) = process_memory_command(&provider_manager, &mut engine, command).await {
                     eprintln!("Error processing command: {}", e);
                 }
             }
@@ -241,8 +251,9 @@ async fn start_simple_interactive_mode(provider_manager: ProviderManager) -> Res
     Ok(())
 }
 
-async fn process_simple_command(
-    provider_manager: &std::sync::Arc<ProviderManager>,
+async fn process_memory_command(
+    provider_manager: &Arc<ProviderManager>,
+    engine: &mut ComrudeEngine,
     command: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let parts: Vec<&str> = command.split_whitespace().collect();
@@ -257,45 +268,69 @@ async fn process_simple_command(
                 return Ok(());
             }
             let question = parts[1..].join(" ");
-            handle_ask_command(provider_manager, question).await?;
+            handle_memory_ask_command(provider_manager, engine, question).await?;
         }
-        "help" => {
+        "help" | "/help" => {
             show_help();
         }
-        "providers" => {
+        "providers" | "/providers" => {
             list_providers(provider_manager).await;
         }
+        "quit" | "exit" | "q" | "/quit" | "/exit" | "/q" => {
+            // Exit the application gracefully
+            std::process::exit(0);
+        }
         _ => {
-            println!("Unknown command: {}. Type 'help' for available commands.", parts[0]);
+            // Treat any non-command as a direct question
+            handle_memory_ask_command(provider_manager, engine, command.to_string()).await?;
         }
     }
 
     Ok(())
 }
 
-async fn handle_ask_command(
-    provider_manager: &std::sync::Arc<ProviderManager>,
+async fn handle_memory_ask_command(
+    provider_manager: &Arc<ProviderManager>,
+    engine: &mut ComrudeEngine,
     question: String,
 ) -> Result<(), Box<dyn std::error::Error>> {
     use comrude_core::GenerationRequest;
+    use std::collections::HashMap;
 
-    println!("User: {}", question);
+    // Create user message
+    let user_message = Message::new_user(question.clone());
+    
+    // Start conversation turn with memory context
+    let turn_id = engine.start_conversation_turn(user_message, vec![]).await?;
 
+    // Get context from memory for the request
+    let context = engine.get_context_for_request()?;
+    
+    // Build request with memory context
     let request = GenerationRequest {
         prompt: question,
         model: None,
-        system_prompt: Some("You are a helpful AI assistant.".to_string()),
+        system_prompt: Some("You are a helpful AI assistant. Remember previous conversations and user preferences.".to_string()),
         max_tokens: Some(2048),
         temperature: Some(0.7),
         stream: false,
         tools: Vec::new(),
-        context: Vec::new(),
-        metadata: std::collections::HashMap::new(),
+        context,
+        metadata: HashMap::new(),
     };
 
     match provider_manager.generate(request).await {
         Ok(response) => {
-            println!("Assistant: {}", response.content);
+            // Print response without "Assistant:" prefix
+            println!("{}", response.content);
+            
+            // Create assistant message and complete the conversation turn
+            let assistant_message = Message::new_assistant(
+                response.content, 
+                response.provider, 
+                response.model
+            );
+            engine.complete_conversation_turn(turn_id, assistant_message).await?;
         }
         Err(e) => {
             eprintln!("Error: {}", e);
@@ -310,14 +345,14 @@ fn show_help() {
 Comrude - Universal AI Development Assistant
 
 Commands:
-  ask <question>  - Ask a question to the AI
-  help            - Show this help message
-  providers       - List available providers
-  quit, exit, q   - Exit the application
+  <question>      - Ask a question to the AI (no prefix needed)
+  /help           - Show this help message
+  /providers      - List available providers
+  /quit, /exit, /q - Exit the application
 
 Examples:
-  ask What is Rust?
-  ask How do I create a vector in Rust?
+  What is Rust?
+  How do I create a vector in Rust?
 "#;
     println!("{}", help_text.trim());
 }

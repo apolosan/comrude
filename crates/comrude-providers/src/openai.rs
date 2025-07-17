@@ -203,6 +203,17 @@ impl LLMProvider for OpenAIProvider {
                 capabilities: vec!["text".to_string(), "tools".to_string(), "vision".to_string()],
             },
             ModelInfo {
+                id: "gpt-4o-mini".to_string(),
+                name: "GPT-4o Mini".to_string(),
+                description: "Smaller, faster version of GPT-4o".to_string(),
+                context_length: 128000,
+                cost_per_1k_tokens: CostPer1k {
+                    input: 0.00015,
+                    output: 0.0006,
+                },
+                capabilities: vec!["text".to_string(), "tools".to_string()],
+            },
+            ModelInfo {
                 id: "gpt-3.5-turbo".to_string(),
                 name: "GPT-3.5 Turbo".to_string(),
                 description: "Fast and efficient model for most tasks".to_string(),

@@ -35,3 +35,11 @@ auto_pull_models = false
 [files]
 max_file_size_mb = 10
 allowed_extensions = ["rs", "py", "js", "ts", "go", "java", "cpp", "c", "md", "txt", "json", "yaml", "toml"]
+
+[memory]
+max_context_turns = 3
+max_context_tokens = 8000
+enable_diff_compression = true
+enable_summarization = true
+session_storage_path = ".comrude/sessions"
+session_max_age_days = 30

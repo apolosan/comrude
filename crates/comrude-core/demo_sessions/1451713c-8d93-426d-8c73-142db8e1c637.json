@@ -1,0 +1,141 @@
+{
+  "id": "1451713c-8d93-426d-8c73-142db8e1c637",
+  "name": "Demo Session",
+  "created_at": "2025-07-16T23:27:30.562980854Z",
+  "updated_at": "2025-07-16T23:27:30.578535067Z",
+  "conversation_turns": [
+    {
+      "id": "3563a2cf-656d-47ff-9675-970b44ae0442",
+      "timestamp": "2025-07-16T23:27:30.564242028Z",
+      "user_message": {
+        "id": "913ea96d-b4a9-454f-b444-06224af4a327",
+        "timestamp": "2025-07-16T23:27:30.564235146Z",
+        "sender": "User",
+        "content": {
+          "Text": "Optimize the fibonacci function for better performance"
+        },
+        "status": "Complete"
+      },
+      "assistant_response": {
+        "id": "8234c33b-593b-458f-964d-a043533da5ce",
+        "timestamp": "2025-07-16T23:27:30.575402986Z",
+        "sender": {
+          "Assistant": {
+            "provider": "demo_provider",
+            "model": "demo_model"
+          }
+        },
+        "content": {
+          "Text": "Here's an optimized version using memoization:\n\ndef fibonacci_memo(n, memo={}):\n    if n in memo:\n        return memo[n]\n    if n <= 1:\n        return n\n    memo[n] = fibonacci_memo(n-1, memo) + fibonacci_memo(n-2, memo)\n    return memo[n]"
+        },
+        "status": "Complete"
+      },
+      "context_snapshot": [
+        {
+          "item_type": {
+            "Code": {
+              "language": "python"
+            }
+          },
+          "content": "def fibonacci(n): ...",
+          "metadata": {}
+        }
+      ],
+      "tokens_used": 77
+    },
+    {
+      "id": "453865e4-fef7-477e-abdf-c514e08148e4",
+      "timestamp": "2025-07-16T23:27:30.575975913Z",
+      "user_message": {
+        "id": "dfefcfb7-a95a-40c0-a6d7-67c70f02e980",
+        "timestamp": "2025-07-16T23:27:30.575967830Z",
+        "sender": "User",
+        "content": {
+          "Text": "Add docstrings and type hints to the fibonacci function"
+        },
+        "status": "Complete"
+      },
+      "assistant_response": {
+        "id": "31eaf700-f5d6-46f7-8061-9b988980e2f7",
+        "timestamp": "2025-07-16T23:27:30.576921994Z",
+        "sender": {
+          "Assistant": {
+            "provider": "demo_provider",
+            "model": "demo_model"
+          }
+        },
+        "content": {
+          "Text": "Here's the documented version:\n\ndef fibonacci_memo(n: int, memo: dict = {}) -> int:\n    \"\"\"Calculate fibonacci number with memoization.\n    \n    Args:\n        n: The position in fibonacci sequence\n        memo: Memoization cache\n    \n    Returns:\n        The fibonacci number at position n\n    \"\"\"\n    if n in memo:\n        return memo[n]\n    if n <= 1:\n        return n\n    memo[n] = fibonacci_memo(n-1, memo) + fibonacci_memo(n-2, memo)\n    return memo[n]"
+        },
+        "status": "Complete"
+      },
+      "context_snapshot": [
+        {
+          "item_type": {
+            "Code": {
+              "language": "python"
+            }
+          },
+          "content": "def fibonacci_memo(n, memo={}): ...",
+          "metadata": {}
+        }
+      ],
+      "tokens_used": 135
+    },
+    {
+      "id": "9a63bdf9-03a9-4e2e-92bd-15528fcc50ec",
+      "timestamp": "2025-07-16T23:27:30.577687856Z",
+      "user_message": {
+        "id": "0c691be0-2448-4365-bde0-07defa67047d",
+        "timestamp": "2025-07-16T23:27:30.577677166Z",
+        "sender": "User",
+        "content": {
+          "Text": "Write unit tests for the fibonacci function"
+        },
+        "status": "Complete"
+      },
+      "assistant_response": {
+        "id": "c765bd50-dae8-485d-b8b3-8c06b146e2db",
+        "timestamp": "2025-07-16T23:27:30.578525692Z",
+        "sender": {
+          "Assistant": {
+            "provider": "demo_provider",
+            "model": "demo_model"
+          }
+        },
+        "content": {
+          "Text": "Here are comprehensive unit tests:\n\nimport unittest\n\nclass TestFibonacci(unittest.TestCase):\n    def test_base_cases(self):\n        self.assertEqual(fibonacci_memo(0), 0)\n        self.assertEqual(fibonacci_memo(1), 1)\n    \n    def test_sequence(self):\n        expected = [0, 1, 1, 2, 3, 5, 8, 13]\n        for i, exp in enumerate(expected):\n            self.assertEqual(fibonacci_memo(i), exp)"
+        },
+        "status": "Complete"
+      },
+      "context_snapshot": [
+        {
+          "item_type": {
+            "Code": {
+              "language": "python"
+            }
+          },
+          "content": "def fibonacci_memo(n: int, memo: dict = {}) -> int: ...",
+          "metadata": {}
+        }
+      ],
+      "tokens_used": 121
+    }
+  ],
+  "cumulative_context": [
+    {
+      "item_type": "Text",
+      "content": "DIFF: 14 -> 55",
+      "metadata": {}
+    }
+  ],
+  "session_metadata": {},
+  "config": {
+    "max_context_turns": 3,
+    "max_context_tokens": 1000,
+    "enable_diff_compression": true,
+    "enable_summarization": true,
+    "session_storage_path": "./demo_sessions",
+    "session_max_age_days": 7
+  }
+}

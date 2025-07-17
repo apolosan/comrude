@@ -7,12 +7,14 @@ pub struct Config {
     pub ui: UIConfig,
     pub providers: ProvidersConfig,
     pub files: FilesConfig,
+    pub memory: MemoryConfigSerde,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub name: String,
     pub version: String,
+    pub default_provider: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -86,12 +88,62 @@ pub struct FilesConfig {
     pub allowed_extensions: Vec<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MemoryConfigSerde {
+    pub max_context_turns: usize,
+    pub max_context_tokens: usize,
+    pub enable_diff_compression: bool,
+    pub enable_summarization: bool,
+    pub session_storage_path: String,
+    pub session_max_age_days: u32,
+}
+
+impl Default for MemoryConfigSerde {
+    fn default() -> Self {
+        Self {
+            max_context_turns: 3,
+            max_context_tokens: 8000,
+            enable_diff_compression: true,
+            enable_summarization: true,
+            session_storage_path: ".comrude/sessions".to_string(),
+            session_max_age_days: 30,
+        }
+    }
+}
+
+impl From<MemoryConfigSerde> for crate::memory::MemoryConfig {
+    fn from(config: MemoryConfigSerde) -> Self {
+        Self {
+            max_context_turns: config.max_context_turns,
+            max_context_tokens: config.max_context_tokens,
+            enable_diff_compression: config.enable_diff_compression,
+            enable_summarization: config.enable_summarization,
+            session_storage_path: std::path::PathBuf::from(config.session_storage_path),
+            session_max_age_days: config.session_max_age_days,
+        }
+    }
+}
+
+impl From<crate::memory::MemoryConfig> for MemoryConfigSerde {
+    fn from(config: crate::memory::MemoryConfig) -> Self {
+        Self {
+            max_context_turns: config.max_context_turns,
+            max_context_tokens: config.max_context_tokens,
+            enable_diff_compression: config.enable_diff_compression,
+            enable_summarization: config.enable_summarization,
+            session_storage_path: config.session_storage_path.to_string_lossy().to_string(),
+            session_max_age_days: config.session_max_age_days,
+        }
+    }
+}
+
 impl Default for Config {
     fn default() -> Self {
         Self {
             app: AppConfig {
                 name: "Comrude".to_string(),
                 version: "0.1.0".to_string(),
+                default_provider: Some("openai".to_string()),
             },
             ui: UIConfig {
                 theme: "dark".to_string(),
@@ -102,7 +154,7 @@ impl Default for Config {
                 openai: Some(OpenAIConfig {
                     enabled: true,
                     api_key_env: "OPENAI_API_KEY".to_string(),
-                    default_model: "gpt-4".to_string(),
+                    default_model: "gpt-4o-mini".to_string(),
                     max_tokens: 4096,
                     timeout_seconds: 30,
                     base_url: "https://api.openai.com/v1".to_string(),
@@ -132,6 +184,7 @@ impl Default for Config {
                     "md", "txt", "json", "yaml", "toml"
                 ].into_iter().map(String::from).collect(),
             },
+            memory: MemoryConfigSerde::default(),
         }
     }
 }
@@ -258,7 +311,7 @@ impl Default for OpenAIConfig {
         Self {
             enabled: true,
             api_key_env: "OPENAI_API_KEY".to_string(),
-            default_model: "gpt-4".to_string(),
+            default_model: "gpt-4o-mini".to_string(),
             max_tokens: 4096,
             timeout_seconds: 30,
             base_url: "https://api.openai.com/v1".to_string(),

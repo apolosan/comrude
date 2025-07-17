@@ -3,6 +3,7 @@
 [app]
 name = "Comrude"
 version = "0.1.0"
+default_provider = "openai"
 
 [ui]
 theme = "dark"
@@ -12,7 +13,7 @@ max_history_items = 1000
 [providers.openai]
 enabled = true
 api_key_env = "OPENAI_API_KEY"
-default_model = "gpt-4"
+default_model = "gpt-4o-mini"
 max_tokens = 4096
 timeout_seconds = 30
 base_url = "https://api.openai.com/v1"
@@ -38,3 +39,11 @@ allowed_extensions = [
     "rs", "py", "js", "ts", "go", "java", "cpp", "c",
     "md", "txt", "json", "yaml", "toml", "html", "css"
 ]
+
+[memory]
+max_context_turns = 3
+max_context_tokens = 8000
+enable_diff_compression = true
+enable_summarization = true
+session_storage_path = ".comrude/sessions"
+session_max_age_days = 30

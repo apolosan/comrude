@@ -67,6 +67,9 @@ chrono = { version = "0.4", features = ["serde"] }
 # TTY detection
 atty = "0.2"
 
+# Unix system calls for process group management
+libc = "0.2"
+
 # Internal crates
 comrude-core = { path = "crates/comrude-core" }
 comrude-shell = { path = "crates/comrude-shell" }

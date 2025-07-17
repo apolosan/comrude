@@ -75,22 +75,22 @@ impl AppState {
         }
 
         match parts[0] {
-            "quit" | "exit" | "q" => {
+            "/quit" | "/exit" | "/q" => {
                 self.should_quit = true;
             }
-            "help" => {
+            "/help" => {
                 self.show_help().await;
             }
-            "clear" => {
+            "/clear" => {
                 let mut conversation = self.conversation.write().await;
                 conversation.clear();
             }
-            "reset" => {
+            "/reset" => {
                 let mut conversation = self.conversation.write().await;
                 conversation.clear();
                 self.status_message = Some("Console cleared".to_string());
             }
-            _ if parts[0] == "select" => {
+            _ if parts[0] == "/select" => {
                 if parts.len() > 1 {
                     let provider_name = parts[1];
                     self.handle_select_with_name(provider_name).await;
@@ -98,13 +98,13 @@ impl AppState {
                     self.handle_select_command().await;
                 }
             }
-            "providers" => {
+            "/providers" => {
                 self.list_providers().await;
             }
-            "list" => {
+            "/list" => {
                 self.list_models().await;
             }
-            _ if parts[0] == "model" => {
+            _ if parts[0] == "/model" => {
                 if parts.len() > 1 {
                     let model_name = parts[1];
                     self.handle_model_command(model_name).await;
@@ -162,16 +162,16 @@ Comrude - Universal AI Development Assistant
 
 Commands:
   <question>          - Ask a question to the AI (no prefix needed)
-  help                - Show this help message
-  clear               - Clear conversation history
-  reset               - Clear console and conversation history
-  select              - Select which AI provider to use (interactive)
-  select <provider>   - Select provider directly by name
-  providers           - List available providers
-  list                - List available models for current provider
-  model               - Show current model
-  model <model_id>    - Select model for current provider
-  quit, exit, q       - Exit the application
+  /help               - Show this help message
+  /clear              - Clear conversation history
+  /reset              - Clear console and conversation history
+  /select             - Select which AI provider to use (interactive)
+  /select <provider>  - Select provider directly by name
+  /providers          - List available providers
+  /list               - List available models for current provider
+  /model              - Show current model
+  /model <model_id>   - Select model for current provider
+  /quit, /exit, /q    - Exit the application
 
 Navigation:
   Tab             - Switch between input modes

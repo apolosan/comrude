@@ -45,3 +45,9 @@ toml.workspace = true
 # UUID and chrono for our simple implementation
 uuid.workspace = true
 chrono.workspace = true
+
+# Terminal handling
+crossterm.workspace = true
+
+# Unix system calls for process group management
+libc.workspace = true

@@ -29,6 +29,24 @@ pub enum ComrudeError {
     #[error("File operation error: {0}")]
     FileOp(String),
 
+    #[error("Memory management error: {0}")]
+    Memory(String),
+
+    #[error("Session error: {0}")]
+    Session(String),
+
+    #[error("Invalid state: {0}")]
+    InvalidState(String),
+
+    #[error("Not found: {0}")]
+    NotFound(String),
+
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
+    #[error("IO error: {0}")]
+    IoError(std::io::Error),
+
     #[error("Unknown error: {0}")]
     Unknown(String),
 }
@@ -79,5 +97,6 @@ pub enum ProviderError {
 }
 
 pub type Result<T> = std::result::Result<T, ComrudeError>;
+pub type ComrudeResult<T> = std::result::Result<T, ComrudeError>;
 pub type ConfigResult<T> = std::result::Result<T, ConfigError>;
 pub type ProviderResult<T> = std::result::Result<T, ProviderError>;

@@ -25,3 +25,5 @@ Thumbs.db
 # Ignore documentation files, but allow README.md
 *.md
 !README.md
+
+.comrude
